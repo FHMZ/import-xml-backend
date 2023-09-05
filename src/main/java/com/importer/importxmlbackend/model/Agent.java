@@ -1,10 +1,10 @@
 package com.importer.importxmlbackend.model;
 
+import com.importer.importxmlbackend.model.dto.AgentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,4 +38,11 @@ public class Agent {
     )
     private List<Region> regions;
 
+    public static Agent toPersist(AgentDTO agent) {
+        return Agent.builder()
+                .id(agent.getCodigo())
+                .date(agent.getData())
+                .regions(Region.toPersist(agent.getRegiao()))
+                .build();
+    }
 }

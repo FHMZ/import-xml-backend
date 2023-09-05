@@ -1,11 +1,11 @@
 package com.importer.importxmlbackend.model;
 
+import com.importer.importxmlbackend.model.dto.RegionDTO;
 import com.importer.importxmlbackend.util.RegionCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,9 +14,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -32,8 +32,6 @@ public class Region {
 
     @Column(name = "region_code")
     private RegionCode regionCode;
-
-    private Long generatedId;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -58,5 +56,18 @@ public class Region {
             inverseJoinColumns = @JoinColumn(name = "id")
     )
     private List<MediumPrice> mediumPrice;
+
+    public static List<Region> toPersist(List<RegionDTO> regions) {
+        List<Region> regionList = new ArrayList<>();
+        regions.forEach(r ->
+                regionList.add(Region.builder()
+                        .regionCode(r.getSigla())
+                        .generated(Generated.toPersist(r.getGeracao()))
+                        .purchase(Purchase.toPersist(r.getCompra()))
+                        .mediumPrice(MediumPrice.toPersist(r.getPrecoMedio()))
+                        .build())
+        );
+        return regionList;
+    }
 
 }

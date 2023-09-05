@@ -27,8 +27,7 @@ public class ImportXmlService {
 
     public void createFile(MultipartFile multipartFile) {
         final File file = new File(multipartFile.getName());
-        final AgentDTO agent = convertFromXml(file);
-        log.info("Agent: ", agent);
+        final Agent agent = Agent.toPersist(convertFromXml(file));
     }
 
     public List<Agent> getAllFiles() {
