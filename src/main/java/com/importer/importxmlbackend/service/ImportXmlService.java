@@ -4,6 +4,10 @@ import com.importer.importxmlbackend.exception.FileNotFoundException;
 import com.importer.importxmlbackend.model.Agent;
 import com.importer.importxmlbackend.model.dto.AgentDTO;
 import com.importer.importxmlbackend.repository.AgentRepository;
+import com.importer.importxmlbackend.repository.GeneratedRepository;
+import com.importer.importxmlbackend.repository.MediumPriceRepository;
+import com.importer.importxmlbackend.repository.PurchaseRepository;
+import com.importer.importxmlbackend.repository.RegionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,9 +29,25 @@ public class ImportXmlService {
 
     private final AgentRepository agentRepository;
 
+    private final GeneratedRepository generatedRepository;
+
+    private final MediumPriceRepository mediumPriceRepository;
+
+    private final PurchaseRepository purchaseRepository;
+
+    private final RegionRepository regionRepository;
+
     public void createFile(MultipartFile multipartFile) {
         final File file = new File(multipartFile.getName());
         final Agent agent = Agent.toPersist(convertFromXml(file));
+        agentRepository.save(agent);
+        if (!regionRepository.saveAll(agent.getRegions()).isEmpty()) {
+            agent.getRegions().forEach(r -> {
+                generatedRepository.saveAll(r.getGenerated());
+                mediumPriceRepository.saveAll(r.getMediumPrice());
+                purchaseRepository.saveAll(r.getPurchase());
+            });
+        }
     }
 
     public List<Agent> getAllFiles() {
